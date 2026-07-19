@@ -1,33 +1,30 @@
 name: Kennisbank Bot
-
+ 
 on:
   schedule:
-    # Tijden zijn in UTC. NL zomertijd = UTC+2, dus 07:00 UTC = 09:00 NL.
-    - cron: "0 7 * * *"     # dagelijkse digest om 09:00 NL (zomertijd)
-    - cron: "0 8-20 * * *"  # uurlijkse check op opvallendheden, 10:00-22:00 NL
-  workflow_dispatch: {}      # handmatig starten via de Actions-tab (om te testen)
-
+    # Tijden in UTC. NL zomertijd = UTC+2.
+    - cron: "0 7 * * *"      # dagelijkse digest ~09:00 NL
+    - cron: "0 8-20 * * *"   # elk uur 10:00-22:00 NL: alerts-check + random-drop-dobbelsteen
+  workflow_dispatch: {}
+ 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install dependencies
         run: pip install requests matplotlib feedparser
-
       - name: Run bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          # Digest bij de 07:00 UTC run, anders stille check
           if [ "$(date -u +%H)" = "07" ]; then
-            python bot_v2.py
+            python bot_v3.py
           else
-            python bot_v2.py --check
+            python bot_v3.py --check
+            python bot_v3.py --random
           fi
