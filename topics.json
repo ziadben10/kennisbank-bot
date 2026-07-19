@@ -1,0 +1,4 @@
+{
+  "enabled": ["crypto", "ai", "tech", "gaza", "autos"],
+  "random_chance": 0.25
+}
